@@ -121,7 +121,7 @@ class ModalDialog {
             if (typeof this.modal.close === 'function') {
                 this.modal.close(); // закрываем диалог
             }
-        }, 300); // должно совпадать с длительностью анимации в CSS
+        }, 300);
     }
 
     handleFormSubmit() {
@@ -151,13 +151,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const tabButtons = document.querySelectorAll('[data-tab]');
+    const heroWrapper = document.querySelector('.hero__wrapper');
+    const heroWrapperModal = document.querySelector('.hero__wrapper-modal');
     const heroInfo = document.querySelector('.hero__info');
     const heroInfoModal = document.querySelector('.hero__info-modal');
     const carouselTrack = document.querySelector('.carousel__track');
     const carouselTrackModal = document.querySelector('.carousel__track-modal');
-    const prevBtn = document.querySelector('.carousel__btn--prev');
-    const nextBtn = document.querySelector('.carousel__btn--next');
-    const progressFill = document.querySelector('.carousel__progress-fill');
 
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -166,6 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
             // скрываем всё
             heroInfo?.classList.remove('active');
             heroInfoModal?.classList.remove('active');
+            heroWrapper?.classList.remove('active');
+            heroWrapperModal?.classList.remove('active');
             carouselTrack?.classList.remove('active');
             carouselTrackModal?.classList.remove('active');
 
@@ -181,6 +182,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isSwiperActive = true;
 
                 heroInfo?.classList.add('active');
+                heroWrapper?.classList.add('active')
                 carouselTrack?.classList.add('active');
 
                 if (window.swiper && !window.swiper.destroyed) {
@@ -202,6 +204,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 isSwiperActive = false;
 
                 heroInfoModal?.classList.add('active');
+                heroWrapperModal?.classList.add('active')
                 carouselTrackModal?.classList.add('active');
 
                 // прогресс на 100%
