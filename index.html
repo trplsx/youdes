@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ru">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,7 +22,7 @@
                         </a>
                     </div>
                 </header>
-                <div class="hero__wrapper">
+                <div class="hero__wrapper active">
                     <div class="hero__info active">
                         <h2 class="hero__title">ИНФО<br>ГРАФИКА</h2>
                         <p class="hero__desc">Наш дизайн – это баланс минимализма <br>и стиля. Мы создаём инфографику
@@ -43,22 +44,25 @@
                     </div>
                 </div>
 
-                <div class="hero__info-modal">
-                    <h2 class="hero__title">3D<br>МОДЕЛИ<br>РОВАНИЕ</h2>
-                    <p class="hero__desc">
-                        Товар, который хочется купить с первого взгляда! Мы создаем фотореалистичные <br>
-                        3D модели товаров с качественными рендерами для маркетплейсов.
-                    </p>
-                    <p class="hero__desc">
-                        В отличие от обычных фотографий, рендеры позволяют показать товар в лучшем виде,<br> с
-                        максимальной
-                        детализацией, идеальными ракурсами и точной цветопередачей!
-                    </p>
-                    <button class="hero__link btn-reset">
-                        Обсудить проект
-                        <img src="./img/arrow.png" alt="arrow">
-                    </button>
+                <div class="hero__wrapper-modal">
+                    <div class="hero__info-modal">
+                        <h2 class="hero__title">3D<br>МОДЕЛИ<br>РОВАНИЕ</h2>
+                        <p class="hero__desc">
+                            Товар, который хочется купить с первого взгляда! Мы создаем фотореалистичные <br>
+                            3D модели товаров с качественными рендерами для маркетплейсов.
+                        </p>
+                        <p class="hero__desc">
+                            В отличие от обычных фотографий, рендеры позволяют показать товар в лучшем виде,<br> с
+                            максимальной
+                            детализацией, идеальными ракурсами и точной цветопередачей!
+                        </p>
+                        <button class="hero__link btn-reset">
+                            Обсудить проект
+                            <img src="./img/arrow.png" alt="arrow">
+                        </button>
+                    </div>
                 </div>
+
                 <footer class="hero__footer">
                     <div class="hero__footer-content">
                         <span class="hero__footer-copy">© Youdes, 2025</span>
@@ -212,7 +216,7 @@
                     <div class="form__checkbox">
                         <input type="checkbox" id="privacy" name="privacy" class="form__checkbox-input" required>
                         <label for="privacy" class="form__checkbox-label">
-                            Я даю согласие на обработку моих персональных данных в соответствии с
+                            Я даю согласие на обработку моих персональных данных <br>в соответствии с
                             <a href="./policy.html" class="form__link">Политикой конфиденциальности</a>
                         </label>
                     </div>
@@ -228,6 +232,5 @@
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="js/main.js"></script>
 </body>
-
 
 </html>
