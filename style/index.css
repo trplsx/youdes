@@ -57,7 +57,7 @@ body {
 
 .hero__info,
 .hero__footer {
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform .3s ease, opacity .3s ease;
     transform: translateX(0);
     opacity: 1;
 }
@@ -77,9 +77,25 @@ body {
 }
 
 .hero__wrapper {
+    display: none;
+}
+
+.hero__wrapper-modal {
+    display: none;
+}
+
+.hero__wrapper.active {
+    display: block;
     flex-grow: 1;
     align-content: center;
-    transition: transform 0.3s ease, opacity 0.3s ease;
+    transition: transform .3s ease, opacity .3s ease;
+}
+
+.hero__wrapper-modal.active {
+    display: block;
+    flex-grow: 1;
+    align-content: center;
+    transition: transform .3s ease, opacity .3s ease;
 }
 
 .hero__info.active {
@@ -115,7 +131,7 @@ body {
     align-items: flex-start;
     flex-grow: 1;
     justify-content: center;
-    animation: modalFadeIn 0.3s ease forwards;
+    animation: modalFadeIn .3s ease forwards;
 }
 
 .hero__title {
@@ -301,7 +317,7 @@ body {
     height: 912px;
     background-color: #1B1B1B;
     flex-shrink: 0;
-    transition: height 0.3s ease;
+    transition: height .3s ease;
 }
 
 .carousel__slide {
@@ -336,7 +352,7 @@ body {
     align-items: center;
     transform: translateY(100%);
     pointer-events: none;
-    transition: transform 0.3s ease;
+    transition: transform .3s ease;
 }
 
 .carousel__caption-desc {
@@ -399,12 +415,12 @@ body {
     height: 100%;
     background-color: #FFFFFF;
     width: 0%;
-    transition: width 0.3s ease;
+    transition: width .3s ease;
     transform-origin: left center;
 }
 
 .carousel__btn img {
-    transition: filter 0.3s ease;
+    transition: filter .3s ease;
 }
 
 .carousel__btn--prev:not(.active) img {
@@ -416,7 +432,7 @@ body {
 }
 
 .carousel__track {
-    transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    transition: transform .3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .modal {
@@ -426,7 +442,7 @@ body {
     border: none;
     background: #171717;
     opacity: 0;
-    animation: modalFadeIn 0.3s ease forwards;
+    animation: modalFormFadeIn 0.3s ease forwards;
 }
 
 .modal[open] {
@@ -440,11 +456,11 @@ body {
     padding: 40px 120px 40px 120px;
     width: 100%;
     height: 100%;
-    animation: modalFadeIn 0.3s ease forwards;
+    /* animation: modalFormFadeIn 0.3s ease forwards; */
 }
 
 .modal.closing {
-    animation: modalFadeOut 0.3s ease forwards;
+    animation: modalFormFadeOut .3s ease forwards;
 }
 
 .modal__logo {
@@ -505,7 +521,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     font-size: 23px;
     padding: 20px 0 20px 0;
     color: #FFFFFF;
-    transition: border-color 0.3s ease;
+    transition: border-color .3s ease;
     margin-bottom: 60px;
 }
 
@@ -554,7 +570,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     width: 16px;
     height: 16px;
     border: 2px solid #FFFFFF;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
     cursor: pointer;
 }
 
@@ -567,7 +583,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     height: 10px;
     background-color: #FFFFFF;
     opacity: 0;
-    transition: opacity 0.3s ease;
+    transition: opacity .3s ease;
     cursor: pointer;
 }
 
@@ -584,7 +600,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 .form__link {
     color: #FFFFFF;
     text-decoration: underline;
-    transition: opacity 0.3s ease;
+    transition: opacity .3s ease;
 }
 
 .form__link:hover {
@@ -598,7 +614,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     padding: 23px;
     font-size: 23px;
     font-weight: 600;
-    transition: all 0.3s ease;
+    transition: all .3s ease;
 }
 
 .form__submit:hover {
@@ -619,6 +635,16 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 
     to {
         opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes modalFormFadeIn {
+    from {
+        transform: translateX(-784px);
+    }
+
+    to {
         transform: translateX(0);
     }
 }
@@ -644,5 +670,15 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     to {
         opacity: 0;
         transform: translateX(-200px);
+    }
+}
+
+@keyframes modalFormFadeOut {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(-784px);
     }
 }
