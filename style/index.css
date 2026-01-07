@@ -37,7 +37,7 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
-    transition: .3s ease;
+    transition: border-right 0s ease-in-out 0.3s;
 }
 
 .hero__content {
