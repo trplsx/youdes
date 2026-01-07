@@ -150,98 +150,84 @@ document.addEventListener('DOMContentLoaded', () => {
         window.contactModal = new ModalDialog('contactModal');
     }
 
-    const tabButtons = document.querySelectorAll('[data-tab]');
-    const heroWrapper = document.querySelector('.hero__wrapper');
-    const heroWrapperModal = document.querySelector('.hero__wrapper-modal');
-    const heroInfo = document.querySelector('.hero__info');
-    const heroInfoModal = document.querySelector('.hero__info-modal');
-    const carouselTrack = document.querySelector('.carousel__track');
-    const carouselTrackModal = document.querySelector('.carousel__track-modal');
+    // Кэшируем все DOM элементы один раз
+    const elements = {
+        gallery: document.querySelector('.gallery'),
+        backBtn: document.querySelector('.carousel__back-btn'),
+        hero: document.querySelector('.hero'),
+        track: document.querySelector('.carousel__track'),
+        tabButtons: document.querySelectorAll('[data-tab]'),
+        heroWrapper: document.querySelector('.hero__wrapper'),
+        heroWrapperModal: document.querySelector('.hero__wrapper-modal'),
+        heroInfo: document.querySelector('.hero__info'),
+        heroInfoModal: document.querySelector('.hero__info-modal'),
+        carouselTrack: document.querySelector('.carousel__track'),
+        carouselTrackModal: document.querySelector('.carousel__track-modal'),
+        progressFill: document.querySelector('.carousel__progress-fill'),
+        prevBtn: document.querySelector('.carousel__btn--prev'),
+        nextBtn: document.querySelector('.carousel__btn--next'),
+        captions: document.querySelectorAll('.carousel__caption')
+    };
 
-    tabButtons.forEach(button => {
-        button.addEventListener('click', () => {
-            const tabName = button.dataset.tab;
+    // Сохраняем оригинальные элементы один раз при загрузке
+    let originalGroups = [];
+    let originalSlides = [];
 
-            // скрываем всё
-            heroInfo?.classList.remove('active');
-            heroInfoModal?.classList.remove('active');
-            heroWrapper?.classList.remove('active');
-            heroWrapperModal?.classList.remove('active');
-            carouselTrack?.classList.remove('active');
-            carouselTrackModal?.classList.remove('active');
+    const saveOriginalElements = () => {
+        if (elements.track) {
+            originalGroups = Array.from(elements.track.querySelectorAll('.carousel__group'));
+            originalSlides = Array.from(elements.track.querySelectorAll('.swiper-slide[data-index]'));
+        }
+    };
 
-            tabButtons.forEach(btn => {
-                btn.classList.remove('active');
-                btn.classList.add('gallery__nav-btn--secondary');
+    const restoreOriginalSlides = () => {
+        const wrapper = elements.track?.querySelector('.swiper-wrapper');
+        if (wrapper && originalSlides.length > 0) {
+            wrapper.innerHTML = '';
+            originalSlides.forEach(slide => {
+                const slideClone = slide.cloneNode(true);
+                wrapper.appendChild(slideClone);
             });
 
-            button.classList.add('active');
-            button.classList.remove('gallery__nav-btn--secondary');
+            // После восстановления слайдов нужно повторно навесить обработчики на captions
+            setupCaptionsListeners();
+        }
+    };
 
-            if (tabName === 'infographic') {
-                isSwiperActive = true;
-
-                heroInfo?.classList.add('active');
-                heroWrapper?.classList.add('active')
-                carouselTrack?.classList.add('active');
-
-                if (window.swiper && !window.swiper.destroyed) {
-                    window.swiper.update();
-
-                    // ❗ ВОЗВРАЩАЕМ СОСТОЯНИЕ КНОПОК ВРУЧНУЮ
-                    const prevBtn = document.querySelector('.carousel__btn--prev');
-                    const nextBtn = document.querySelector('.carousel__btn--next');
-
-                    const atStart = window.swiper.isBeginning;
-                    const atEnd = window.swiper.isEnd;
-
-                    prevBtn?.classList.toggle('active', !atStart);
-                    nextBtn?.classList.toggle('active', !atEnd);
-                }
-            }
-
-            if (tabName === '3d') {
-                isSwiperActive = false;
-
-                heroInfoModal?.classList.add('active');
-                heroWrapperModal?.classList.add('active')
-                carouselTrackModal?.classList.add('active');
-
-                // прогресс на 100%
-                const progressFill = document.querySelector('.carousel__progress-fill');
-                if (progressFill) progressFill.style.width = '100%';
-
-                // ❗ визуально отключаем кнопки
-                const prevBtn = document.querySelector('.carousel__btn--prev');
-                const nextBtn = document.querySelector('.carousel__btn--next');
-
-                prevBtn?.classList.remove('active');
-                nextBtn?.classList.remove('active');
-            }
+    // Функция для навешивания обработчиков на captions
+    const setupCaptionsListeners = () => {
+        // Удаляем старые обработчики (если есть)
+        const existingCaptions = document.querySelectorAll('.carousel__caption');
+        existingCaptions.forEach(caption => {
+            const newCaption = caption.cloneNode(true); // Клонируем без обработчиков
+            caption.parentNode.replaceChild(newCaption, caption);
         });
-    });
-});
 
-document.addEventListener('DOMContentLoaded', () => {
-    const hero = document.querySelector('.hero');
-    const gallery = document.querySelector('.gallery');
-    const track = document.querySelector('.carousel__track');
-    const backBtn = document.querySelector('.carousel__back-btn');
-    const originalGroups = Array.from(track.querySelectorAll('.carousel__group'));
-    const originalSlides = Array.from(track.querySelectorAll('.swiper-slide[data-index]'));
+        // Навешиваем новые обработчики
+        const freshCaptions = document.querySelectorAll('.carousel__caption');
+        freshCaptions.forEach(caption => {
+            caption.addEventListener('click', handleCaptionClick);
+        });
 
-    // Слушаем клик по caption
-    document.querySelectorAll('.carousel__caption').forEach(caption => {
-        caption.addEventListener('click', () => {
-            // 1️⃣ Убираем hero__info и hero__footer
-            hero.classList.add('hero--hidden');
-            gallery.classList.add('gallery--hidden');
+        // Обновляем кэшированные элементы
+        elements.captions = freshCaptions;
+    };
 
-            // 2️⃣ Показываем кнопку "Вернуться назад"
-            backBtn.classList.add('active');
+    // Обработчик клика по caption
+    const handleCaptionClick = () => {
+        // Обновляем оригинальные элементы перед открытием проекта
+        saveOriginalElements();
 
-            // 3️⃣ Подготавливаем слайдер выбранного проекта
-            const wrapper = track.querySelector('.swiper-wrapper');
+        // 1️⃣ Убираем hero__info и hero__footer
+        elements.hero?.classList.add('hero--hidden');
+        elements.gallery?.classList.add('gallery--hidden');
+
+        // 2️⃣ Показываем кнопку "Вернуться назад"
+        elements.backBtn?.classList.add('active');
+
+        // 3️⃣ Подготавливаем слайдер выбранного проекта
+        const wrapper = elements.track?.querySelector('.swiper-wrapper');
+        if (wrapper) {
             wrapper.innerHTML = ''; // очищаем track
 
             for (let i = 0; i < 6; i++) {
@@ -254,32 +240,118 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 4️⃣ Активируем track и пересоздаём swiper
-            track.classList.add('active');
-            if (window.swiper && !window.swiper.destroyed) {
-                window.swiper.destroy(true, true);
-            }
-            window.swiper = initSwiperLogic();
-        });
-    });
+            elements.track?.classList.add('active');
+            recreateSwiper();
+        }
+    };
 
-    // Кнопка "Вернуться назад"
-    backBtn.addEventListener('click', () => {
-        // 1️⃣ Возвращаем hero
-        hero.classList.remove('hero--hidden');
-        gallery.classList.remove('gallery--hidden');
+    // Инициализируем оригинальные элементы и навешиваем обработчики
+    saveOriginalElements();
+    setupCaptionsListeners();
 
-        // 2️⃣ Скрываем кнопку "Вернуться назад"
-        backBtn.classList.remove('active');
+    // Вспомогательные функции
+    const updateNavigationButtons = (swiper) => {
+        if (!swiper || swiper.destroyed || !elements.prevBtn || !elements.nextBtn) return;
 
-        // 3️⃣ Восстанавливаем исходные слайды
-        const wrapper = track.querySelector('.swiper-wrapper');
-        wrapper.innerHTML = '';
-        originalSlides.forEach(slide => wrapper.appendChild(slide));
+        const atStart = swiper.isBeginning;
+        const atEnd = swiper.isEnd;
 
-        // 4️⃣ Пересоздаём swiper
+        elements.prevBtn.classList.toggle('active', !atStart);
+        elements.nextBtn.classList.toggle('active', !atEnd);
+    };
+
+    const recreateSwiper = (restoreOriginal = false) => {
         if (window.swiper && !window.swiper.destroyed) {
             window.swiper.destroy(true, true);
         }
+
+        if (restoreOriginal) {
+            restoreOriginalSlides();
+        }
+
         window.swiper = initSwiperLogic();
+
+        // После создания нового swiper обновляем кнопки навигации
+        if (window.swiper && !window.swiper.destroyed) {
+            updateNavigationButtons(window.swiper);
+        }
+    };
+
+    const resetCommonState = (restoreSlides = false) => {
+        elements.gallery?.classList.remove('gallery--hidden');
+        elements.backBtn?.classList.remove('active');
+        elements.hero?.classList.remove('hero--hidden');
+
+        if (restoreSlides) {
+            restoreOriginalSlides();
+        }
+    };
+
+    // Обработчик переключения вкладок
+    elements.tabButtons?.forEach(button => {
+        button.addEventListener('click', () => {
+            const tabName = button.dataset.tab;
+
+            // Скрываем все элементы вкладок
+            const tabElements = [
+                elements.heroInfo, elements.heroInfoModal,
+                elements.heroWrapper, elements.heroWrapperModal,
+                elements.carouselTrack, elements.carouselTrackModal
+            ];
+
+            tabElements.forEach(el => el?.classList.remove('active'));
+
+            // Обновляем кнопки вкладок
+            elements.tabButtons.forEach(btn => {
+                btn.classList.remove('active');
+                btn.classList.add('gallery__nav-btn--secondary');
+            });
+
+            button.classList.add('active');
+            button.classList.remove('gallery__nav-btn--secondary');
+
+            // Сбрасываем общее состояние и восстанавливаем оригинальные слайды при переключении вкладок
+            resetCommonState(true);
+
+            if (tabName === 'infographic') {
+                isSwiperActive = true;
+
+                elements.heroInfo?.classList.add('active');
+                elements.heroWrapper?.classList.add('active');
+                elements.carouselTrack?.classList.add('active');
+
+                // Пересоздаём swiper с восстановлением слайдов
+                recreateSwiper(true);
+
+            } else if (tabName === '3d') {
+                isSwiperActive = false;
+
+                elements.heroInfoModal?.classList.add('active');
+                elements.heroWrapperModal?.classList.add('active');
+                elements.carouselTrackModal?.classList.add('active');
+
+                // Прогресс на 100%
+                if (elements.progressFill) {
+                    elements.progressFill.style.width = '100%';
+                }
+
+                // Отключаем кнопки навигации
+                elements.prevBtn?.classList.remove('active');
+                elements.nextBtn?.classList.remove('active');
+            }
+        });
+    });
+
+    // Обработчик кнопки "Вернуться назад"
+    elements.backBtn?.addEventListener('click', () => {
+        // 1️⃣ Возвращаем hero
+        elements.hero?.classList.remove('hero--hidden');
+        elements.gallery?.classList.remove('gallery--hidden');
+
+        // 2️⃣ Скрываем кнопку "Вернуться назад"
+        elements.backBtn?.classList.remove('active');
+
+        // 3️⃣ Восстанавливаем исходные слайды с обработчиками
+        restoreOriginalSlides();
     });
 });
