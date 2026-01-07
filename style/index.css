@@ -55,7 +55,7 @@ body {
     padding: 0 101px 0 120px;
 }
 
-.hero__header-content {
+.logo {
     position: relative;
     z-index: 1;
 }
@@ -492,7 +492,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 }
 
 .modal__header {
-    margin-bottom: 60px;
+    margin-bottom: 70px;
 }
 
 .modal__title {
@@ -510,6 +510,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 
 
 .form__label {
+    height: 21px;
     display: block;
     font-size: 25px;
     color: #FFFFFF;
