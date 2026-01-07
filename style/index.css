@@ -55,6 +55,11 @@ body {
     padding: 0 101px 0 120px;
 }
 
+.hero__header-content {
+    position: relative;
+    z-index: 1;
+}
+
 .hero__info,
 .hero__footer {
     transition: transform .3s ease, opacity .3s ease;
@@ -274,7 +279,7 @@ body {
     flex-grow: 1;
     align-items: center;
     min-height: 0;
-    animation: modalFadeInRight 0.3s ease forwards;
+    animation: modalFadeInRight .3s ease forwards;
 }
 
 .carousel__track {
@@ -291,7 +296,7 @@ body {
     align-items: center;
     width: 100%;
     height: 100%;
-    animation: modalFadeInRight 0.3s ease forwards;
+    animation: modalFadeInRight .3s ease forwards;
 }
 
 .carousel__track-modal.active {
@@ -468,7 +473,7 @@ body {
 }
 
 dialog:-internal-dialog-in-top-layer::backdrop {
-    background-color: none;
+    background-color: rgba(0, 0, 0, 0);
 }
 
 .modal__close {
@@ -487,7 +492,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 }
 
 .modal__header {
-    margin-bottom: 70px;
+    margin-bottom: 60px;
 }
 
 .modal__title {
@@ -652,7 +657,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 @keyframes modalFadeInRight {
     from {
         opacity: 0;
-        transform: translateX(200px);
+        transform: translateX(400px);
     }
 
     to {
