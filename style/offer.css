@@ -1,0 +1,151 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Montserrat", sans-serif;
+    list-style: none;
+}
+
+a {
+    text-decoration: none;
+}
+
+.btn-reset {
+    border: none;
+    padding: 0;
+    background: transparent;
+    cursor: pointer;
+}
+
+body {
+    background-color: #0F0F0F;
+    color: #FFFFFF;
+    overflow: hidden;
+}
+
+.main {
+    display: flex;
+
+}
+
+.hero {
+    border-right: 1px solid #303030;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+}
+
+.hero__content {
+    width: 1194px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    animation: modalFadeIn 0.3s ease forwards;
+}
+
+.hero__info {
+    padding: 80px 0 80px 120px;
+    border-bottom: 1px #303030 solid;
+}
+
+.hero__title {
+    font-size: 68px;
+    font-weight: 600;
+    line-height: 78px;
+    text-transform: uppercase;
+}
+
+.offer__content {
+    padding: 80px 0 0 100px;
+}
+
+.offer__info {
+    width: 936px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    animation: modalFadeInRight 0.3s ease forwards;
+}
+
+.offer__info-title {
+    font-size: 25px;
+    font-weight: 600;
+}
+
+.offer__info-desc {
+    font-size: 23px;
+    font-weight: 400;
+    line-height: 33px;
+}
+
+.offer__list {
+    font-size: 23px;
+    line-height: 33px;
+    font-weight: 400;
+}
+
+.offer__list-title {
+    font-size: 23px;
+    line-height: 33px;
+    font-weight: 600;
+}
+
+b {
+    font-weight: 600;
+}
+
+.modal__close {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalCloseFadeIn 0.3s ease forwards;
+}
+
+.modal__up {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: modalCloseFadeIn 0.3s ease forwards;
+}
+
+@keyframes modalFadeIn {
+    from {
+        opacity: 0;
+        transform: translateX(-200px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes modalFadeInRight {
+    from {
+        opacity: 0;
+        transform: translateX(200px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes modalCloseFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
