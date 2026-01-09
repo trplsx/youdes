@@ -678,7 +678,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 @keyframes modalFadeInRight {
     from {
         opacity: 0;
-        transform: translateX(400px);
+        transform: translateX(900px);
     }
 
     to {
