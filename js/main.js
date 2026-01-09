@@ -1,6 +1,15 @@
 let isSwiperActive = true;
+let mainSwiperState = {
+    activeIndex: 0,
+    progress: 0
+};
+let projectSwiperState = {
+    activeIndex: 0,
+    progress: 0
+};
+let currentSwiperType = 'main'; // 'main' или 'project'
 
-function initSwiperLogic() {
+function initSwiperLogic(swiperType = 'main') {
     const track = document.querySelector('.carousel__track');
     if (!track) return null;
 
@@ -8,12 +17,16 @@ function initSwiperLogic() {
     const nextBtn = document.querySelector('.carousel__btn--next');
     const progressFill = document.querySelector('.carousel__progress-fill');
 
+    // Выбираем правильное состояние в зависимости от типа свайпера
+    const initialState = swiperType === 'main' ? mainSwiperState : projectSwiperState;
+
     const swiper = new Swiper(track, {
         slidesPerView: 'auto',
         spaceBetween: 30,
         speed: 600,
         grabCursor: true,
         watchSlidesProgress: true,
+        initialSlide: initialState.activeIndex,
         on: {
             afterInit(swiper) {
                 updateUI(swiper);
@@ -26,6 +39,15 @@ function initSwiperLogic() {
             slideChange(swiper) {
                 if (!isSwiperActive) return;
                 updateUI(swiper);
+
+                // Сохраняем состояние в правильный объект
+                if (swiperType === 'main') {
+                    mainSwiperState.activeIndex = swiper.activeIndex;
+                    mainSwiperState.progress = swiper.progress;
+                } else {
+                    projectSwiperState.activeIndex = swiper.activeIndex;
+                    projectSwiperState.progress = swiper.progress;
+                }
             },
             resize(swiper) {
                 if (!isSwiperActive) return;
@@ -38,6 +60,13 @@ function initSwiperLogic() {
     function updateProgress(swiper) {
         if (!progressFill) return;
         progressFill.style.width = `${swiper.progress * 100}%`;
+
+        // Сохраняем прогресс в правильный объект
+        if (swiperType === 'main') {
+            mainSwiperState.progress = swiper.progress;
+        } else {
+            projectSwiperState.progress = swiper.progress;
+        }
     }
 
     function updateUI(swiper) {
@@ -102,7 +131,7 @@ class ModalDialog {
 
     open() {
         this.modal.classList.add('open');
-        this.modal.classList.remove('closing'); // на случай, если был закрыт недавно
+        this.modal.classList.remove('closing');
         this.modal.showModal();
 
         const firstInput = this.modal.querySelector('input');
@@ -112,14 +141,11 @@ class ModalDialog {
     }
 
     close() {
-        // добавляем класс closing для анимации
         this.modal.classList.add('closing');
-
-        // ждём окончания анимации (300мс) и только потом закрываем
         setTimeout(() => {
             this.modal.classList.remove('open', 'closing');
             if (typeof this.modal.close === 'function') {
-                this.modal.close(); // закрываем диалог
+                this.modal.close();
             }
         }, 300);
     }
@@ -140,17 +166,16 @@ class ModalDialog {
     }
 }
 
-
-// Инициализация при загрузке
 document.addEventListener('DOMContentLoaded', () => {
-    window.swiper = initSwiperLogic();
+    // Инициализируем основной свайпер
+    window.swiper = initSwiperLogic('main');
+    currentSwiperType = 'main';
 
     const modalElement = document.getElementById('contactModal');
     if (modalElement) {
         window.contactModal = new ModalDialog('contactModal');
     }
 
-    // Кэшируем все DOM элементы один раз
     const elements = {
         logoBtn: document.querySelector('.logo'),
         gallery: document.querySelector('.gallery'),
@@ -170,11 +195,8 @@ document.addEventListener('DOMContentLoaded', () => {
         captions: document.querySelectorAll('.carousel__caption')
     };
 
-    // Сохраняем оригинальные элементы один раз при загрузке
     let originalGroups = [];
     let originalSlides = [];
-
-    // Флаг для отслеживания, открыты ли проекты
     let isProjectOpen = false;
 
     const saveOriginalElements = () => {
@@ -193,72 +215,152 @@ document.addEventListener('DOMContentLoaded', () => {
                 wrapper.appendChild(slideClone);
             });
 
-            // После восстановления слайдов нужно повторно навесить обработчики на captions
             setupCaptionsListeners();
         }
     };
 
-    // Функция для навешивания обработчиков на captions
     const setupCaptionsListeners = () => {
-        // Удаляем старые обработчики (если есть)
         const existingCaptions = document.querySelectorAll('.carousel__caption');
         existingCaptions.forEach(caption => {
-            const newCaption = caption.cloneNode(true); // Клонируем без обработчиков
+            const newCaption = caption.cloneNode(true);
             caption.parentNode.replaceChild(newCaption, caption);
         });
 
-        // Навешиваем новые обработчики
         const freshCaptions = document.querySelectorAll('.carousel__caption');
         freshCaptions.forEach(caption => {
             caption.addEventListener('click', handleCaptionClick);
         });
 
-        // Обновляем кэшированные элементы
         elements.captions = freshCaptions;
     };
 
-    // Обработчик клика по caption
-    const handleCaptionClick = () => {
-        // Устанавливаем флаг, что проект открыт
-        isProjectOpen = true;
+    const handleCaptionClick = (event) => {
+        const caption = event.currentTarget;
+        const slide = caption.closest('.swiper-slide.carousel__slide');
+        const projectNumber = Number(slide.getAttribute('data-index')) + 1;
 
-        // Обновляем оригинальные элементы перед открытием проекта
+        // Сохраняем текущее состояние основного свайпера ПЕРЕД открытием проекта
+        if (window.swiper && !window.swiper.destroyed) {
+            mainSwiperState.activeIndex = window.swiper.activeIndex;
+            mainSwiperState.progress = window.swiper.progress;
+            console.log('Сохранено состояние основного свайпера:', mainSwiperState);
+        }
+
+        // Сбрасываем состояние проекта на 0
+        projectSwiperState.activeIndex = 0;
+        projectSwiperState.progress = 0;
+
+        isProjectOpen = true;
+        currentSwiperType = 'project';
         saveOriginalElements();
 
-        // 1️⃣ Убираем hero__info и hero__footer
         elements.hero?.classList.add('hero--hidden');
         elements.gallery?.classList.add('gallery--hidden');
-
-        // 2️⃣ Показываем кнопку "Вернуться назад"
         elements.backBtn?.classList.add('active');
 
-        // 3️⃣ Подготавливаем слайдер выбранного проекта
         const wrapper = elements.track?.querySelector('.swiper-wrapper');
         if (wrapper) {
-            wrapper.innerHTML = ''; // очищаем track
+            wrapper.innerHTML = '';
 
-            for (let i = 0; i < 6; i++) {
-                // клонируем только .carousel__group и оборачиваем в новый slide
-                const groupClone = originalGroups[i % originalGroups.length].cloneNode(true);
-                const slide = document.createElement('div');
-                slide.className = 'swiper-slide';
-                slide.appendChild(groupClone);
-                wrapper.appendChild(slide);
-            }
+            const checkImageExists = (url) => {
+                return new Promise((resolve) => {
+                    const img = new Image();
+                    img.onload = () => resolve(true);
+                    img.onerror = () => resolve(false);
+                    img.src = url;
+                });
+            };
 
-            // 4️⃣ Активируем track и пересоздаём swiper
-            // Добавляем специальный класс для отображения при открытом проекте
-            elements.track?.classList.add('project-open');
-            elements.track?.classList.add('active');
-            recreateSwiper();
+            const loadProjectImages = async () => {
+                let imageIndex = 1;
+                const images = [];
+
+                while (true) {
+                    const imageUrl = `./img/${projectNumber}/${imageIndex}.jpg`;
+                    const exists = await checkImageExists(imageUrl);
+
+                    if (exists) {
+                        images.push({
+                            index: imageIndex,
+                            url: imageUrl
+                        });
+                        imageIndex++;
+                    } else {
+                        const pngUrl = `./img/${projectNumber}/${imageIndex}.png`;
+                        const pngExists = await checkImageExists(pngUrl);
+
+                        if (pngExists) {
+                            images.push({
+                                index: imageIndex,
+                                url: pngUrl
+                            });
+                            imageIndex++;
+                        } else {
+                            break;
+                        }
+                    }
+
+                    if (imageIndex > 20) break;
+                }
+
+                return images;
+            };
+
+            loadProjectImages().then(images => {
+                if (images.length === 0) {
+                    for (let i = 0; i < 6; i++) {
+                        const groupClone = originalGroups[i % originalGroups.length].cloneNode(true);
+                        const slide = document.createElement('div');
+                        slide.className = 'swiper-slide';
+                        slide.appendChild(groupClone);
+                        wrapper.appendChild(slide);
+                    }
+                } else {
+                    images.forEach((image, i) => {
+                        const slide = document.createElement('div');
+                        slide.className = 'swiper-slide carousel__slide';
+                        slide.setAttribute('data-project-index', i);
+
+                        const group = document.createElement('div');
+                        group.className = 'carousel__group';
+
+                        const img = document.createElement('img');
+                        img.className = 'carousel__group-img';
+                        img.src = image.url;
+                        img.alt = `Проект ${projectNumber} - ${i + 1}`;
+                        img.loading = 'lazy';
+
+                        group.appendChild(img);
+                        slide.appendChild(group);
+                        wrapper.appendChild(slide);
+                    });
+                }
+
+                elements.track?.classList.add('project-open');
+                elements.track?.classList.add('active');
+
+                // Создаем свайпер проекта с начальным состоянием 0
+                recreateSwiper(false, false, 'project');
+
+            }).catch(() => {
+                for (let i = 0; i < 6; i++) {
+                    const groupClone = originalGroups[i % originalGroups.length].cloneNode(true);
+                    const slide = document.createElement('div');
+                    slide.className = 'swiper-slide';
+                    slide.appendChild(groupClone);
+                    wrapper.appendChild(slide);
+                }
+
+                elements.track?.classList.add('project-open');
+                elements.track?.classList.add('active');
+                recreateSwiper(false, false, 'project');
+            });
         }
     };
 
-    // Инициализируем оригинальные элементы и навешиваем обработчики
     saveOriginalElements();
     setupCaptionsListeners();
 
-    // Вспомогательные функции
     const updateNavigationButtons = (swiper) => {
         if (!swiper || swiper.destroyed || !elements.prevBtn || !elements.nextBtn) return;
 
@@ -269,18 +371,29 @@ document.addEventListener('DOMContentLoaded', () => {
         elements.nextBtn.classList.toggle('active', !atEnd);
     };
 
-    const recreateSwiper = (restoreOriginal = false) => {
+    const recreateSwiper = (restoreOriginal = false, preserveState = false, swiperType = 'main') => {
         if (window.swiper && !window.swiper.destroyed) {
+            // Сохраняем текущее состояние перед уничтожением
+            if (preserveState && window.swiper.activeIndex !== undefined) {
+                if (currentSwiperType === 'main') {
+                    mainSwiperState.activeIndex = window.swiper.activeIndex;
+                    mainSwiperState.progress = window.swiper.progress;
+                } else {
+                    projectSwiperState.activeIndex = window.swiper.activeIndex;
+                    projectSwiperState.progress = window.swiper.progress;
+                }
+            }
             window.swiper.destroy(true, true);
         }
+
+        currentSwiperType = swiperType;
 
         if (restoreOriginal) {
             restoreOriginalSlides();
         }
 
-        window.swiper = initSwiperLogic();
+        window.swiper = initSwiperLogic(swiperType);
 
-        // После создания нового swiper обновляем кнопки навигации
         if (window.swiper && !window.swiper.destroyed) {
             updateNavigationButtons(window.swiper);
         }
@@ -296,14 +409,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // Функция активации вкладки инфографики
     const activateInfographicTab = () => {
-        // Сбрасываем флаг проекта
         isProjectOpen = false;
-
+        currentSwiperType = 'main';
         elements.track?.classList.remove('project-open');
 
-        // Скрываем все элементы вкладок
         const tabElements = [
             elements.heroInfo, elements.heroInfoModal,
             elements.heroWrapper, elements.heroWrapperModal,
@@ -312,40 +422,32 @@ document.addEventListener('DOMContentLoaded', () => {
 
         tabElements.forEach(el => el?.classList.remove('active'));
 
-        // Находим кнопку инфографики и делаем ее активной
         const infographicButton = Array.from(elements.tabButtons).find(btn => btn.dataset.tab === 'infographic');
 
-        // Снимаем active со всех кнопок
         elements.tabButtons.forEach(btn => {
             btn.classList.remove('active');
             btn.classList.add('gallery__nav-btn--secondary');
         });
 
-        // Делаем инфографику активной
         if (infographicButton) {
             infographicButton.classList.add('active');
             infographicButton.classList.remove('gallery__nav-btn--secondary');
         }
 
-        // Сбрасываем общее состояние и восстанавливаем оригинальные слайды
         resetCommonState(true);
-
         isSwiperActive = true;
 
         elements.heroInfo?.classList.add('active');
         elements.heroWrapper?.classList.add('active');
         elements.carouselTrack?.classList.add('active');
 
-        // Пересоздаём swiper с восстановлением слайдов
-        recreateSwiper(true);
+        recreateSwiper(true, false, 'main');
     };
 
-    // Обработчик переключения вкладок
     elements.tabButtons?.forEach(button => {
         button.addEventListener('click', () => {
             const tabName = button.dataset.tab;
 
-            // Скрываем все элементы вкладок
             const tabElements = [
                 elements.heroInfo, elements.heroInfoModal,
                 elements.heroWrapper, elements.heroWrapperModal,
@@ -354,7 +456,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
             tabElements.forEach(el => el?.classList.remove('active'));
 
-            // Обновляем кнопки вкладок
             elements.tabButtons.forEach(btn => {
                 btn.classList.remove('active');
                 btn.classList.add('gallery__nav-btn--secondary');
@@ -363,109 +464,86 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('active');
             button.classList.remove('gallery__nav-btn--secondary');
 
-            // Убираем кнопку "Назад" при любом переключении вкладок
             setTimeout(() => {
                 elements.backBtn?.classList.remove('active');
-            }, 300)
-
+            }, 300);
 
             if (tabName === 'infographic') {
-                // Сбрасываем флаг проекта
                 isProjectOpen = false;
-
+                currentSwiperType = 'main';
                 elements.track?.classList.remove('project-open');
-
-                // Сбрасываем общее состояние и восстанавливаем оригинальные слайды
                 resetCommonState(true);
-
                 isSwiperActive = true;
 
                 elements.heroInfo?.classList.add('active');
                 elements.heroWrapper?.classList.add('active');
                 elements.carouselTrack?.classList.add('active');
 
-                // Пересоздаём swiper с восстановлением слайдов
-                recreateSwiper(true);
+                recreateSwiper(true, false, 'main');
 
             } else if (tabName === '3d') {
-                // Если проект был открыт, сначала анимация, потом сброс состояния
                 if (isProjectOpen) {
-                    // Добавляем класс для анимации fade-out
                     elements.carouselTrack?.classList.add('fade-out');
 
-                    // Ждем завершения анимации (300мс)
                     setTimeout(() => {
-                        // Убираем класс active после анимации
                         elements.carouselTrack?.classList.remove('active');
-                        // Убираем класс fade-out
                         setTimeout(() => {
                             elements.carouselTrack?.classList.remove('fade-out');
                         }, 10);
 
-                        // После завершения анимации opacity
                         isSwiperActive = false;
-
                         elements.heroInfoModal?.classList.add('active');
                         elements.heroWrapperModal?.classList.add('active');
                         elements.carouselTrackModal?.classList.add('active');
-
-                        // Сбрасываем флаг проекта
                         isProjectOpen = false;
+                        currentSwiperType = 'main';
 
                         if (elements.progressFill) {
                             elements.progressFill.style.width = '100%';
                         }
 
-                        // Только теперь убираем gallery--hidden
                         elements.gallery?.classList.remove('gallery--hidden');
                         elements.hero?.classList.remove('hero--hidden');
-                    }, 300); // Длительность анимации
+                    }, 300);
                 } else {
-                    // Если проект не был открыт, переключаемся сразу
-                    resetCommonState(true); // Сбрасываем состояние сразу
-
+                    resetCommonState(true);
                     isSwiperActive = false;
-
                     elements.heroInfoModal?.classList.add('active');
                     elements.heroWrapperModal?.classList.add('active');
                     elements.carouselTrackModal?.classList.add('active');
+                    currentSwiperType = 'main';
 
                     if (elements.progressFill) {
                         elements.progressFill.style.width = '100%';
                     }
                 }
 
-                // Прогресс на 100%
-
-
-                // Отключаем кнопки навигации
                 elements.prevBtn?.classList.remove('active');
                 elements.nextBtn?.classList.remove('active');
             }
         });
     });
 
-    // Обработчик для логотипа (выполняет функцию инфографики без класса active на лого)
     elements.logoBtn?.addEventListener('click', () => {
         activateInfographicTab();
     });
 
-    // Обработчик кнопки "Вернуться назад"
     elements.backBtn?.addEventListener('click', () => {
-        // Сбрасываем флаг проекта
-        isProjectOpen = false;
+        console.log('Выход из проекта. Восстанавливаем состояние:', mainSwiperState);
 
-        // 1️⃣ Возвращаем hero
+        isProjectOpen = false;
+        currentSwiperType = 'main';
         elements.hero?.classList.remove('hero--hidden');
         elements.gallery?.classList.remove('gallery--hidden');
-
-        // 2️⃣ Скрываем кнопку "Вернуться назад"
         elements.backBtn?.classList.remove('active');
-
-        // 3️⃣ Убираем класс project-open
         elements.track?.classList.remove('project-open');
 
-        // 4️⃣ Восстанавливаем исходные слайды с обработчиками
+        // Восстанавливаем оригинальные слайды
         restoreOriginalSlides();
+
+        // Создаем основной свайпер с сохраненным состоянием
+        setTimeout(() => {
+            recreateSwiper(false, false, 'main');
+        }, 10);
     });
 });
