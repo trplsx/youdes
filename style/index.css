@@ -510,11 +510,10 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 
 
 .form__label {
-    height: 21px;
     display: block;
     font-size: 25px;
     color: #FFFFFF;
-    margin-bottom: 10px;
+    margin-bottom: 25px;
     font-weight: 600;
     line-height: 28px;
 }
@@ -525,10 +524,10 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     border: none;
     border-bottom: 1px #404040 solid;
     font-size: 23px;
-    padding: 20px 0 20px 0;
+    padding-bottom: 20px;
     color: #FFFFFF;
     transition: border-color .3s ease;
-    margin-bottom: 60px;
+    margin-bottom: 59px;
 }
 
 .form__input:focus {
