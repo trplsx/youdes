@@ -510,6 +510,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 
 
 .form__label {
+    height: 21px;
     display: block;
     font-size: 25px;
     color: #FFFFFF;
@@ -687,3 +688,4 @@ dialog:-internal-dialog-in-top-layer::backdrop {
         transform: translateX(-784px);
     }
 }
+
