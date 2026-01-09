@@ -152,6 +152,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Кэшируем все DOM элементы один раз
     const elements = {
+        logoBtn: document.querySelector('.logo'),
         gallery: document.querySelector('.gallery'),
         backBtn: document.querySelector('.carousel__back-btn'),
         hero: document.querySelector('.hero'),
@@ -344,6 +345,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Обработчик кнопки "Вернуться назад"
     elements.backBtn?.addEventListener('click', () => {
+        // 1️⃣ Возвращаем hero
+        elements.hero?.classList.remove('hero--hidden');
+        elements.gallery?.classList.remove('gallery--hidden');
+
+        // 2️⃣ Скрываем кнопку "Вернуться назад"
+        elements.backBtn?.classList.remove('active');
+
+        // 3️⃣ Восстанавливаем исходные слайды с обработчиками
+        restoreOriginalSlides();
+    });
+    elements.logoBtn?.addEventListener('click', () => {
         // 1️⃣ Возвращаем hero
         elements.hero?.classList.remove('hero--hidden');
         elements.gallery?.classList.remove('gallery--hidden');
