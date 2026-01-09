@@ -288,6 +288,48 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
+    // Функция активации вкладки инфографики
+    const activateInfographicTab = () => {
+        // Скрываем все элементы вкладок
+        const tabElements = [
+            elements.heroInfo, elements.heroInfoModal,
+            elements.heroWrapper, elements.heroWrapperModal,
+            elements.carouselTrack, elements.carouselTrackModal
+        ];
+
+        tabElements.forEach(el => el?.classList.remove('active'));
+
+        // Находим кнопку инфографики и делаем ее активной
+        const infographicButton = Array.from(elements.tabButtons).find(btn => btn.dataset.tab === 'infographic');
+
+        console.log(infographicButton);
+
+
+        // Снимаем active со всех кнопок
+        elements.tabButtons.forEach(btn => {
+            btn.classList.remove('active');
+            btn.classList.add('gallery__nav-btn--secondary');
+        });
+
+        // Делаем инфографику активной
+        if (infographicButton) {
+            infographicButton.classList.add('active');
+            infographicButton.classList.remove('gallery__nav-btn--secondary');
+        }
+
+        // Сбрасываем общее состояние и восстанавливаем оригинальные слайды
+        resetCommonState(true);
+
+        isSwiperActive = true;
+
+        elements.heroInfo?.classList.add('active');
+        elements.heroWrapper?.classList.add('active');
+        elements.carouselTrack?.classList.add('active');
+
+        // Пересоздаём swiper с восстановлением слайдов
+        recreateSwiper(true);
+    };
+
     // Обработчик переключения вкладок
     elements.tabButtons?.forEach(button => {
         button.addEventListener('click', () => {
@@ -343,19 +385,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
+    // Обработчик для логотипа (выполняет функцию инфографики без класса active на лого)
+    elements.logoBtn?.addEventListener('click', () => {
+        activateInfographicTab();
+    });
+
     // Обработчик кнопки "Вернуться назад"
     elements.backBtn?.addEventListener('click', () => {
-        // 1️⃣ Возвращаем hero
-        elements.hero?.classList.remove('hero--hidden');
-        elements.gallery?.classList.remove('gallery--hidden');
-
-        // 2️⃣ Скрываем кнопку "Вернуться назад"
-        elements.backBtn?.classList.remove('active');
-
-        // 3️⃣ Восстанавливаем исходные слайды с обработчиками
-        restoreOriginalSlides();
-    });
-    elements.logoBtn?.addEventListener('click', () => {
         // 1️⃣ Возвращаем hero
         elements.hero?.classList.remove('hero--hidden');
         elements.gallery?.classList.remove('gallery--hidden');
