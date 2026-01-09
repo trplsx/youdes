@@ -302,9 +302,6 @@ document.addEventListener('DOMContentLoaded', () => {
         // Находим кнопку инфографики и делаем ее активной
         const infographicButton = Array.from(elements.tabButtons).find(btn => btn.dataset.tab === 'infographic');
 
-        console.log(infographicButton);
-
-
         // Снимаем active со всех кнопок
         elements.tabButtons.forEach(btn => {
             btn.classList.remove('active');
@@ -403,3 +400,4 @@ document.addEventListener('DOMContentLoaded', () => {
         restoreOriginalSlides();
     });
 });
+
