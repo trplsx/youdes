@@ -174,6 +174,9 @@ document.addEventListener('DOMContentLoaded', () => {
     let originalGroups = [];
     let originalSlides = [];
 
+    // Флаг для отслеживания, открыты ли проекты
+    let isProjectOpen = false;
+
     const saveOriginalElements = () => {
         if (elements.track) {
             originalGroups = Array.from(elements.track.querySelectorAll('.carousel__group'));
@@ -216,6 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Обработчик клика по caption
     const handleCaptionClick = () => {
+        // Устанавливаем флаг, что проект открыт
+        isProjectOpen = true;
+
         // Обновляем оригинальные элементы перед открытием проекта
         saveOriginalElements();
 
@@ -241,6 +247,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // 4️⃣ Активируем track и пересоздаём swiper
+            // Добавляем специальный класс для отображения при открытом проекте
+            elements.track?.classList.add('project-open');
             elements.track?.classList.add('active');
             recreateSwiper();
         }
@@ -278,7 +286,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    const resetCommonState = (restoreSlides = false) => {
+    const resetCommonState = (restoreSlides = true) => {
         elements.gallery?.classList.remove('gallery--hidden');
         elements.backBtn?.classList.remove('active');
         elements.hero?.classList.remove('hero--hidden');
@@ -290,6 +298,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Функция активации вкладки инфографики
     const activateInfographicTab = () => {
+        // Сбрасываем флаг проекта
+        isProjectOpen = false;
+
+        elements.track?.classList.remove('project-open');
+
         // Скрываем все элементы вкладок
         const tabElements = [
             elements.heroInfo, elements.heroInfoModal,
@@ -350,10 +363,21 @@ document.addEventListener('DOMContentLoaded', () => {
             button.classList.add('active');
             button.classList.remove('gallery__nav-btn--secondary');
 
-            // Сбрасываем общее состояние и восстанавливаем оригинальные слайды при переключении вкладок
-            resetCommonState(true);
+            // Убираем кнопку "Назад" при любом переключении вкладок
+            setTimeout(() => {
+                elements.backBtn?.classList.remove('active');
+            }, 300)
+
 
             if (tabName === 'infographic') {
+                // Сбрасываем флаг проекта
+                isProjectOpen = false;
+
+                elements.track?.classList.remove('project-open');
+
+                // Сбрасываем общее состояние и восстанавливаем оригинальные слайды
+                resetCommonState(true);
+
                 isSwiperActive = true;
 
                 elements.heroInfo?.classList.add('active');
@@ -364,11 +388,44 @@ document.addEventListener('DOMContentLoaded', () => {
                 recreateSwiper(true);
 
             } else if (tabName === '3d') {
-                isSwiperActive = false;
+                // Если проект был открыт, сначала анимация, потом сброс состояния
+                if (isProjectOpen) {
+                    // Добавляем класс для анимации fade-out
+                    elements.carouselTrack?.classList.add('fade-out');
 
-                elements.heroInfoModal?.classList.add('active');
-                elements.heroWrapperModal?.classList.add('active');
-                elements.carouselTrackModal?.classList.add('active');
+                    // Ждем завершения анимации (300мс)
+                    setTimeout(() => {
+                        // Убираем класс active после анимации
+                        elements.carouselTrack?.classList.remove('active');
+                        // Убираем класс fade-out
+                        setTimeout(() => {
+                            elements.carouselTrack?.classList.remove('fade-out');
+                        }, 10);
+
+                        // После завершения анимации opacity
+                        isSwiperActive = false;
+
+                        elements.heroInfoModal?.classList.add('active');
+                        elements.heroWrapperModal?.classList.add('active');
+                        elements.carouselTrackModal?.classList.add('active');
+
+                        // Сбрасываем флаг проекта
+                        isProjectOpen = false;
+
+                        // Только теперь убираем gallery--hidden
+                        elements.gallery?.classList.remove('gallery--hidden');
+                        elements.hero?.classList.remove('hero--hidden');
+                    }, 300); // Длительность анимации
+                } else {
+                    // Если проект не был открыт, переключаемся сразу
+                    resetCommonState(true); // Сбрасываем состояние сразу
+
+                    isSwiperActive = false;
+
+                    elements.heroInfoModal?.classList.add('active');
+                    elements.heroWrapperModal?.classList.add('active');
+                    elements.carouselTrackModal?.classList.add('active');
+                }
 
                 // Прогресс на 100%
                 if (elements.progressFill) {
@@ -389,6 +446,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Обработчик кнопки "Вернуться назад"
     elements.backBtn?.addEventListener('click', () => {
+        // Сбрасываем флаг проекта
+        isProjectOpen = false;
+
         // 1️⃣ Возвращаем hero
         elements.hero?.classList.remove('hero--hidden');
         elements.gallery?.classList.remove('gallery--hidden');
@@ -396,8 +456,10 @@ document.addEventListener('DOMContentLoaded', () => {
         // 2️⃣ Скрываем кнопку "Вернуться назад"
         elements.backBtn?.classList.remove('active');
 
-        // 3️⃣ Восстанавливаем исходные слайды с обработчиками
+        // 3️⃣ Убираем класс project-open
+        elements.track?.classList.remove('project-open');
+
+        // 4️⃣ Восстанавливаем исходные слайды с обработчиками
         restoreOriginalSlides();
     });
 });
-
