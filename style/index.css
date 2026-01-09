@@ -346,6 +346,10 @@ body {
     transition: height .3s ease;
 }
 
+.carousel__group-img {
+    width: 100%;
+}
+
 .carousel__slide {
     display: flex;
     flex-direction: column;
@@ -354,10 +358,6 @@ body {
     overflow: hidden;
 
 
-}
-
-.carousel__slide:hover .carousel__group {
-    height: 801px;
 }
 
 .carousel__slide:hover .carousel__caption {
@@ -379,6 +379,7 @@ body {
     transform: translateY(100%);
     pointer-events: none;
     transition: transform .3s ease;
+    border-top: 15px solid #0F0F0F;
 }
 
 .carousel__caption-desc {
