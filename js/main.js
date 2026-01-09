@@ -412,6 +412,10 @@ document.addEventListener('DOMContentLoaded', () => {
                         // Сбрасываем флаг проекта
                         isProjectOpen = false;
 
+                        if (elements.progressFill) {
+                            elements.progressFill.style.width = '100%';
+                        }
+
                         // Только теперь убираем gallery--hidden
                         elements.gallery?.classList.remove('gallery--hidden');
                         elements.hero?.classList.remove('hero--hidden');
@@ -425,12 +429,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     elements.heroInfoModal?.classList.add('active');
                     elements.heroWrapperModal?.classList.add('active');
                     elements.carouselTrackModal?.classList.add('active');
+
+                    if (elements.progressFill) {
+                        elements.progressFill.style.width = '100%';
+                    }
                 }
 
                 // Прогресс на 100%
-                if (elements.progressFill) {
-                    elements.progressFill.style.width = '100%';
-                }
+
 
                 // Отключаем кнопки навигации
                 elements.prevBtn?.classList.remove('active');
