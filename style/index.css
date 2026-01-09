@@ -273,6 +273,21 @@ body {
     /* overflow: hidden; */
 }
 
+.carousel__track {
+    display: none;
+}
+
+/* Когда проект открыт - display: flex */
+.carousel__track.project-open {
+    display: flex;
+    padding: 80px 0 80px 0;
+    flex-grow: 1;
+    align-items: center;
+    min-height: 0;
+    animation: FadeOut .3s ease forwards;
+}
+
+/* Когда активна вкладка инфографики - display: flex с анимацией */
 .carousel__track.active {
     display: flex;
     padding: 80px 0 80px 0;
@@ -280,14 +295,20 @@ body {
     align-items: center;
     min-height: 0;
     animation: modalFadeInRight .3s ease forwards;
+    opacity: 1;
 }
 
-.carousel__track {
-    display: none;
+/* Анимация fade-out при переходе на 3D из проекта */
+.carousel__track.project-open.fade-out {
+    animation: FadeOut .3s ease forwards;
 }
 
 .swiper-wrapper {
     display: flex;
+}
+
+.carousel__track.reverse-animation {
+    animation: modalFadeOutLeft .3s ease forwards;
 }
 
 .carousel__track-modal {
@@ -510,7 +531,6 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 
 
 .form__label {
-    height: 21px;
     display: block;
     font-size: 25px;
     color: #FFFFFF;
@@ -689,3 +709,25 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     }
 }
 
+@keyframes modalFadeOutLeft {
+    from {
+        opacity: 1;
+        transform: translateX(0);
+    }
+
+    to {
+        opacity: 0;
+        transform: translateX(-400px);
+    }
+}
+
+@keyframes FadeOut {
+    from {
+        opacity: 1;
+    }
+
+    to {
+        opacity: 0;
+        display: none
+    }
+}
