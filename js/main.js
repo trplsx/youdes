@@ -262,49 +262,37 @@ document.addEventListener('DOMContentLoaded', () => {
         if (wrapper) {
             wrapper.innerHTML = '';
 
-            const checkImageExists = (url) => {
-                return new Promise((resolve) => {
-                    const img = new Image();
-                    img.onload = () => resolve(true);
-                    img.onerror = () => resolve(false);
-                    img.src = url;
-                });
+            const checkImageExists = async (url) => {
+                try {
+                    const res = await fetch(url, { method: 'HEAD' });
+                    return res.ok;
+                } catch {
+                    return false;
+                }
             };
 
             const loadProjectImages = async () => {
                 let imageIndex = 1;
                 const images = [];
+                const MAX_IMAGES = 50;
 
-                while (true) {
-                    const imageUrl = `./img/${projectNumber}/${imageIndex}.jpg`;
-                    const exists = await checkImageExists(imageUrl);
+                while (imageIndex <= MAX_IMAGES) {
+                    const jpgUrl = `./img/${projectNumber}/${imageIndex}.jpg`;
 
-                    if (exists) {
-                        images.push({
-                            index: imageIndex,
-                            url: imageUrl
-                        });
-                        imageIndex++;
-                    } else {
-                        const pngUrl = `./img/${projectNumber}/${imageIndex}.png`;
-                        const pngExists = await checkImageExists(pngUrl);
+                    const exists = await checkImageExists(jpgUrl);
+                    if (!exists) break;
 
-                        if (pngExists) {
-                            images.push({
-                                index: imageIndex,
-                                url: pngUrl
-                            });
-                            imageIndex++;
-                        } else {
-                            break;
-                        }
-                    }
+                    images.push({
+                        index: imageIndex,
+                        url: jpgUrl
+                    });
 
-                    if (imageIndex > 20) break;
+                    imageIndex++;
                 }
 
                 return images;
             };
+
 
             loadProjectImages().then(images => {
                 if (images.length === 0) {
@@ -498,9 +486,14 @@ document.addEventListener('DOMContentLoaded', () => {
                         isProjectOpen = false;
                         currentSwiperType = 'main';
 
+                        // СБРОС ПРОГРЕССА ДЛЯ 3D ВКЛАДКИ
                         if (elements.progressFill) {
-                            elements.progressFill.style.width = '100%';
+                            elements.progressFill.style.width = '0%';
                         }
+
+                        // Сбрасываем состояние основного свайпера
+                        mainSwiperState.activeIndex = 0;
+                        mainSwiperState.progress = 0;
 
                         elements.gallery?.classList.remove('gallery--hidden');
                         elements.hero?.classList.remove('hero--hidden');
@@ -513,9 +506,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     elements.carouselTrackModal?.classList.add('active');
                     currentSwiperType = 'main';
 
+                    // СБРОС ПРОГРЕССА ДЛЯ 3D ВКЛАДКИ
                     if (elements.progressFill) {
-                        elements.progressFill.style.width = '100%';
+                        elements.progressFill.style.width = '0%';
                     }
+
+                    // Сбрасываем состояние основного свайпера
+                    mainSwiperState.activeIndex = 0;
+                    mainSwiperState.progress = 0;
                 }
 
                 elements.prevBtn?.classList.remove('active');
