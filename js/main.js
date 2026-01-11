@@ -31,6 +31,8 @@ function initSwiperLogic(swiperType = 'main') {
             afterInit(swiper) {
                 updateUI(swiper);
                 updateProgress(swiper);
+                // Добавляем обработчик колесика после инициализации
+                addMouseWheelHandler(swiper);
             },
             progress(swiper) {
                 if (!isSwiperActive) return;
@@ -56,6 +58,44 @@ function initSwiperLogic(swiperType = 'main') {
             }
         }
     });
+
+    // Функция для добавления обработчика колесика мыши
+    function addMouseWheelHandler(swiperInstance) {
+        let isScrolling = false;
+        let scrollTimeout;
+
+        track.addEventListener('wheel', (e) => {
+            if (!isSwiperActive) return;
+
+            // Предотвращаем стандартный скролл страницы
+            e.preventDefault();
+
+            // Если уже идет скролл, игнорируем новое событие
+            if (isScrolling) return;
+
+            // Определяем направление скролла
+            const delta = e.deltaY || e.deltaX;
+
+            // Порог для срабатывания
+            if (Math.abs(delta) < 5) return;
+
+            isScrolling = true;
+
+            if (delta > 0) {
+                // Скролл вниз/вправо - следующий слайд
+                swiperInstance.slideNext();
+            } else {
+                // Скролл вверх/влево - предыдущий слайд
+                swiperInstance.slidePrev();
+            }
+
+            // Сбрасываем флаг через короткое время
+            clearTimeout(scrollTimeout);
+            scrollTimeout = setTimeout(() => {
+                isScrolling = false;
+            }, 300); // Задержка между скроллами
+        }, { passive: false }); // Важно: passive: false для возможности preventDefault
+    }
 
     function updateProgress(swiper) {
         if (!progressFill) return;
