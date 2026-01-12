@@ -348,13 +348,13 @@
                 <form class="form" id="contactForm" method="dialog">
                     <div class="form__group">
                         <label for="name" class="form__label">Как Вас зовут?</label>
-                        <input type="text" id="name" name="name" class="form__input" placeholder="Ваше имя" required>
+                        <input type="text" id="name" name="name" class="form__input" placeholder="Ваше имя" required maxlength="15">
                     </div>
 
                     <div class="form__group">
                         <label for="telegram" class="form__label">Telegram</label>
                         <input type="text" id="telegram" name="telegram" class="form__input"
-                            placeholder="Логин или ссылка" required>
+                            placeholder="Логин или ссылка" required maxlength="30">
                     </div>
 
                     <div class="form__checkbox">
@@ -373,6 +373,8 @@
         </dialog>
     </main>
 
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="js/telegram.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
     <script src="js/main.js"></script>
 </body>
