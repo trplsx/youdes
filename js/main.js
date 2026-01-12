@@ -191,18 +191,64 @@ class ModalDialog {
     }
 
     handleFormSubmit() {
-        const formData = new FormData(this.form);
-        const data = Object.fromEntries(formData);
+    const formData = new FormData(this.form);
+    const data = Object.fromEntries(formData);
 
-        if (!data.name || !data.telegram || !data.privacy) {
-            alert('Пожалуйста, заполните все обязательные поля');
-            return;
-        }
+    // Валидация
+    if (!data.name || !data.telegram || !data.privacy) {
+        alert('Пожалуйста, заполните все обязательные поля');
+        return;
+    }
 
-        console.log('Данные формы:', data);
-        alert('Спасибо! Мы свяжемся с вами в Telegram в ближайшее время.');
-        this.close();
-        this.form.reset();
+    // Получаем элементы
+    const submitBtn = this.form.querySelector('.form__submit');
+    const originalText = submitBtn.textContent;
+
+    // Блокируем кнопку
+    submitBtn.disabled = true;
+    submitBtn.classList.add('push');
+
+    // Отправляем в Telegram
+    const telegramSender = new TelegramSender();
+    
+    telegramSender.sendApplication(data.name, data.telegram)
+        .then(result => {
+            if (result.success) {
+                // Успешная отправка
+                setTimeout(() => {
+                    submitBtn.textContent = 'Заявка отправлена';
+                    submitBtn.classList.add('success');
+                    submitBtn.classList.remove('push');
+                }, 600)
+                
+                // Сбрасываем форму
+                this.form.reset();
+                
+                // Закрываем окно через 1.5 секунды
+                setTimeout(() => {
+                    this.close();
+                    
+                    // Восстанавливаем кнопку
+                    setTimeout(() => {
+                        submitBtn.textContent = originalText;
+                        submitBtn.classList.remove('success');
+                        submitBtn.disabled = false;
+                    }, 300);
+                }, 5000);
+                
+            } else {
+                submitBtn.classList.remove('push');
+                alert(`Ошибка отправки: ${result.message}\nПопробуйте еще раз или свяжитесь с нами напрямую.`);
+                submitBtn.textContent = originalText;
+                submitBtn.disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Ошибка:', error);
+            alert('Произошла ошибка сети. Пожалуйста, попробуйте еще раз.');
+            submitBtn.textContent = originalText;
+            submitBtn.disabled = false;
+        });
     }
 }
 
@@ -283,7 +329,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (window.swiper && !window.swiper.destroyed) {
             mainSwiperState.activeIndex = window.swiper.activeIndex;
             mainSwiperState.progress = window.swiper.progress;
-            console.log('Сохранено состояние основного свайпера:', mainSwiperState);
         }
 
         // Сбрасываем состояние проекта на 0
@@ -567,7 +612,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     elements.backBtn?.addEventListener('click', () => {
-        console.log('Выход из проекта. Восстанавливаем состояние:', mainSwiperState);
 
         isProjectOpen = false;
         currentSwiperType = 'main';
@@ -585,3 +629,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10);
     });
 });
+
+
