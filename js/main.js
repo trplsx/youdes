@@ -207,48 +207,68 @@ class ModalDialog {
     // Блокируем кнопку
     submitBtn.disabled = true;
     submitBtn.classList.add('push');
+    submitBtn.textContent = 'Отправка...';
 
-    // Отправляем в Telegram
-    const telegramSender = new TelegramSender();
-    
-    telegramSender.sendApplication(data.name, data.telegram)
-        .then(result => {
-            if (result.success) {
-                // Успешная отправка
-                setTimeout(() => {
-                    submitBtn.textContent = 'Заявка отправлена';
-                    submitBtn.classList.add('success');
-                    submitBtn.classList.remove('push');
-                }, 600)
-                
-                // Сбрасываем форму
-                this.form.reset();
-                
-                // Закрываем окно через 1.5 секунды
-                setTimeout(() => {
-                    this.close();
-                    
-                    // Восстанавливаем кнопку
-                    setTimeout(() => {
-                        submitBtn.textContent = originalText;
-                        submitBtn.classList.remove('success');
-                        submitBtn.disabled = false;
-                    }, 300);
-                }, 5000);
-                
-            } else {
-                submitBtn.classList.remove('push');
-                alert(`Ошибка отправки: ${result.message}\nПопробуйте еще раз или свяжитесь с нами напрямую.`);
-                submitBtn.textContent = originalText;
-                submitBtn.disabled = false;
-            }
+    const API_URL = 'https://youdes-server.onrender.com/api/send-to-telegram';
+
+    // Отправляем данные на наш сервер
+    fetch(API_URL, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            name: data.name,
+            telegram: data.telegram
         })
-        .catch(error => {
-            console.error('Ошибка:', error);
-            alert('Произошла ошибка сети. Пожалуйста, попробуйте еще раз.');
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Успешная отправка
+            setTimeout(() => {
+                submitBtn.textContent = 'Заявка отправлена';
+                submitBtn.classList.add('success');
+                submitBtn.classList.remove('push');
+            }, 600);
+            
+            // Сбрасываем форму
+            this.form.reset();
+            
+            // Закрываем окно через 5 секунд
+            setTimeout(() => {
+                this.close();
+                
+                // Восстанавливаем кнопку
+                setTimeout(() => {
+                    submitBtn.textContent = originalText;
+                    submitBtn.classList.remove('success');
+                    submitBtn.disabled = false;
+                }, 300);
+            }, 5000);
+            
+        } else {
+            // Ошибка от сервера
+            submitBtn.classList.remove('push');
             submitBtn.textContent = originalText;
             submitBtn.disabled = false;
-        });
+            
+            alert(`Ошибка: ${result.message}\nПопробуйте еще раз или свяжитесь с нами напрямую.`);
+        }
+    })
+    .catch(error => {
+        // Ошибка сети
+        console.error('Сетевая ошибка:', error);
+        submitBtn.classList.remove('push');
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+        
+        if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
+            alert('Не удалось подключиться к серверу. Проверьте подключение к интернету.');
+        } else {
+            alert('Произошла непредвиденная ошибка. Попробуйте еще раз.');
+        }
+    });
     }
 }
 
