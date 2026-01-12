@@ -243,12 +243,11 @@ class ModalDialog {
                 this.close();
                 
                 // Восстанавливаем кнопку
-                setTimeout(() => {
-                    submitBtn.textContent = originalText;
-                    submitBtn.classList.remove('success');
-                    submitBtn.disabled = false;
-                }, 300);
-            }, 5000);
+                submitBtn.textContent = originalText;
+                submitBtn.classList.remove('success');
+                submitBtn.disabled = false;
+            
+            }, 600);
             
         } else {
             // Ошибка от сервера
@@ -652,5 +651,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 10);
     });
 });
+
 
 
