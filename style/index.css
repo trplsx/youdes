@@ -388,32 +388,37 @@ body {
     font-weight: 400;
 }
 
+.carousel__btn--next {
+    margin-right: 20px;
+}
+
 .carousel__controls {
     display: flex;
     align-items: center;
     gap: 50px;
     flex-shrink: 0;
     padding-bottom: 92px;
-    transition: all 5s ease;
-}
-
-.carousel__btn--next {
-    margin-right: 20px;
+    transition: gap 0.3s ease; /* Анимация отступов */
 }
 
 .carousel__back-btn {
-    width: 158px;
+    margin-right: -50px;
+    width: 0;
+    overflow: hidden;
     flex-shrink: 0;
-    display: none;
+    display: block;
     color: #737373;
     font-size: 18px;
     cursor: pointer;
+    white-space: nowrap;
     opacity: 0;
+    transition: width 0.3s ease, opacity 0.3s ease;
 }
 
 .carousel__back-btn.active {
-    display: block;
-    animation: FadeIn .3s ease forwards;
+    width: 158px;
+    opacity: 1;
+    margin-right: 0;
 }
 
 .carousel__back-btn:hover {
@@ -636,6 +641,7 @@ dialog:-internal-dialog-in-top-layer::backdrop {
 }
 
 .form__submit {
+    position: relative;
     width: 100%;
     border: 1px #FFFFFF solid;
     color: #FFFFFF;
@@ -643,16 +649,28 @@ dialog:-internal-dialog-in-top-layer::backdrop {
     font-size: 23px;
     font-weight: 600;
     transition: all .3s ease;
+    z-index: 1;
 }
 
-.form__submit:hover {
-    background-color: #FFFFFF;
-    color: #171717;
-    transform: translateY(-1px);
+.form__submit::after {
+  content: "";
+  position: absolute;
+  width: 0;
+  height: 100%;
+  top: 0;
+  left: 0;
+  background-color: #FFFFFF;
+  transition: width .6s ease;
+  z-index: -1;
 }
 
-.form__submit:active {
-    transform: translateY(0);
+.form__submit.push::after  {
+  width: 100%;
+}
+
+.form__submit.success::after  {
+  width: 100%;
+  background-color: #528355;
 }
 
 @keyframes modalFadeIn {
